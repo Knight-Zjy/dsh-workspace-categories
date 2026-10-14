@@ -12,6 +12,9 @@
     "type": "git",
     "url": "git+https://github.com/Knight-Zjy/dsh-workspace-categories.git"
   },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/"
+  },
   "keywords": [
     "deepseek",
     "harness",
