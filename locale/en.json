@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "Workspace Tree",
+    "description": "Replaces the sidebar workspace browser with a Category > Workspace > Session tree: custom categories, drag to file, remembered collapse state, one click back to the native list."
+  }
+}

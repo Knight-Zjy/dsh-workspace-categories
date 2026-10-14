@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" width="96" height="96" role="img" aria-label="Workspace Tree">
+  <defs>
+    <linearGradient id="twt" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#3b82f6"/>
+      <stop offset="1" stop-color="#8b5cf6"/>
+    </linearGradient>
+  </defs>
+  <rect x="4" y="4" width="88" height="88" rx="20" fill="url(#twt)" opacity="0.14"/>
+  <g stroke="url(#twt)" stroke-width="5" stroke-linecap="round" fill="none">
+    <path d="M28 36v28"/>
+    <path d="M28 43h16"/>
+    <path d="M28 64h16"/>
+  </g>
+  <g fill="url(#twt)">
+    <rect x="14" y="22" width="20" height="14" rx="4"/>
+    <rect x="44" y="36" width="34" height="14" rx="4"/>
+    <rect x="44" y="57" width="26" height="14" rx="4"/>
+  </g>
+</svg>

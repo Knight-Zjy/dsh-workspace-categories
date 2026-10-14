@@ -1,0 +1,67 @@
+{
+  "name": "dsh-workspace-categories",
+  "version": "0.1.0",
+  "description": "分类树形式的工作区管理器（分类 > 工作区 > 会话），接管 DeepSeek Harness 左侧栏的工作区浏览器。",
+  "type": "module",
+  "main": "lib/index.js",
+  "license": "MIT",
+  "author": "knight <knight-z@foxmail.com>",
+  "icon": "./icon.svg",
+  "homepage": "https://github.com/Knight-Zjy/dsh-workspace-categories",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Knight-Zjy/dsh-workspace-categories.git"
+  },
+  "keywords": [
+    "deepseek",
+    "harness",
+    "dsh",
+    "dsh-plugin",
+    "workspace",
+    "sidebar",
+    "tree",
+    "categories",
+    "分类",
+    "工作区"
+  ],
+  "engines": {
+    "dsh": ">=0.2.0-rc.2"
+  },
+  "peerDependencies": {
+    "@deepseek-ai/cordis": "^4.0.4",
+    "@deepseek-ai/dsh-client-ui-sidebar": "^0.2.0-rc.2",
+    "@deepseek-ai/dsh-client-ui-slots": "^0.2.0-rc.2",
+    "@deepseek-ai/dsh-client-ui-workspace": "^0.2.0-rc.2"
+  },
+  "exports": {
+    ".": {
+      "default": "./lib/index.js"
+    },
+    "./client": {
+      "default": "./lib/client.js"
+    },
+    "./package.json": "./package.json",
+    "./locale/*.json": "./locale/*.json"
+  },
+  "files": [
+    "lib",
+    "locale",
+    "cordis.patch.yml",
+    "icon.svg",
+    "README.md",
+    "LICENSE"
+  ],
+  "dsh": {
+    "manifestVersion": 1,
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "inject": [
+        "@deepseek-ai/dsh-client-ui-sidebar",
+        "@deepseek-ai/dsh-client-ui-workspace"
+      ]
+    }
+  }
+}

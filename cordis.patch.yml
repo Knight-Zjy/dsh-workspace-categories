@@ -1,0 +1,13 @@
+# dsh-workspace-categories bundle patch
+#
+# This is the `dsh.bundle.patch` layer: adding this package to
+# `dsh.profile.bundles` makes the profile boot merge this patch, which mounts
+# the loader row for the plugin (host half + `dsh.client` scan).
+#
+# The `disabled` guard backs this row off when another enabled entry already
+# mounts `dsh-workspace-categories`, so an accidental double mount cannot
+# create two competing `sidebar.workspaces` registrations.
+- insert:
+    - id: workspace-tree
+      name: 'dsh-workspace-categories'
+      disabled: !!js "[...ctx.loader.entries()].some((e) => e.options.name === 'dsh-workspace-categories' && e.options.id !== 'workspace-tree' && !e.disabled)"
