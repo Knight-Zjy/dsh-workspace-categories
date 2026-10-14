@@ -104,10 +104,23 @@ npm login
 npm publish --dry-run
 npm publish --access public
 
-# 4) 去 awesome-dsh-plugin 提 PR，在列表里加一条
+# 4) 去 awesome-dsh-plugin 提 PR
 #    贡献说明：https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/blob/main/contributing.md
-#    你只需给：name / owner / url(GitHub) / category / description{en,zh} / 可选 screenshots[]
-#    version、stars、downloads、install、capabilities、added 全部自动生成。
+#    只加「一个文件」：data/plugins/<owner>__<repo>.yml，内容是
+#      url: https://github.com/Knight-Zjy/dsh-workspace-categories
+#      name: Knight-Zjy/dsh-workspace-categories
+#      category: ui
+#      description:
+#        en: ...        # 唯一必填项，以句号结尾；含 ": " 必须加引号
+#        zh: ...        # 可选，不写维护者会补
+#    两个 README 是脚本从 data/plugins/*.yml 生成的，不要手改。
+#    version / stars / downloads / install / capabilities / added 全部由 CI 自动生成。
+#
+#    硬性前置（CI 会查，缺一即红）：
+#      - 仓库创建满 1 天  ← 本仓库 created_at=2026-10-14T04:20:19Z，
+#                           最早可提 PR 时间 = 2026-10-15T04:20:19Z（北京时间 10-15 12:20）
+#      - 仓库带 dsh-plugin topic（已加）
+#      - package.json 声明 dsh.bundle.patch（已有）——只声明 dsh.client 会被拒
 
 # 5) 收录后（约一天）在「设置 → 插件市场」搜到；也可命令行直接装：
 dsh plugin --profile desktop add dsh-workspace-categories
@@ -127,6 +140,20 @@ GitHub Actions 在打 tag 时自动 `npm publish`（`secrets.NPM_TOKEN`）。
 
 ## 6. 坑
 
+- **`npm publish` 返回 202 = 已受理，但异步**（本机 2026-10-14 实测）：
+  ```
+  npm notice Your package is being processed and may take a few minutes to become available.
+  npm http fetch PUT 202 https://registry.npmjs.org/dsh-workspace-categories
+  ```
+  此刻 registry 上只有占位版本 `0.0.0-stage`
+  （`"stub": true`，描述 `Temporary package placeholder for staged publishing`），
+  真版本 `0.1.0` 要 **约 100 秒**后才出现在 `dist-tags.latest` 并让版本端点返回 200。
+  这期间重发会报
+  `409 Conflict - Cannot publish over previously staged version "0.1.0"` 或
+  `EPUBLISHCONFLICT: You cannot publish over the previously published versions: 0.1.0.`
+  —— **这不是失败，别改版本号重发**。用 `npm view <pkg> versions dist-tags --prefer-online`
+  或直接 `curl .../dsh-workspace-categories/0.1.0` 复查即可。
+  `npm stage list`（需 npm ≥ 12，如 `npx npm@12.2.0 stage list`）队列为空也正常，那是人工审批用的暂存区，与本流程无关。
 - **先撤掉本地软链安装**：删 `~/.dsh/profiles/desktop/node_modules/<包名>` 软链 +
   `~/.dsh/profiles/desktop/package.json` 的 `dsh.profile.bundles` 里那一条，
   否则市场装的 npm 版和软链版会打架。（本机现在正是软链安装状态：

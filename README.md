@@ -64,20 +64,31 @@ ctx.get('workspaces')        // create({ path }) / rename / delete / insertBefor
 
 ## 安装
 
-profile 目录：`~/.dsh/profiles/desktop`
+已发布到 npm：**`dsh-workspace-categories`**
+
+```bash
+# 推荐：走包管理器，会自动写进该 profile 的 dsh.profile.bundles
+dsh plugin --profile desktop add dsh-workspace-categories
+```
+
+也可以在应用内「设置 → 插件」里添加插件，填包名 `dsh-workspace-categories`。
+
+然后**重启桌面应用**。`cordis.yml` 是生成物，不要手改。
+
+卸载：`dsh plugin --profile desktop remove dsh-workspace-categories` 然后重启。
+
+### 从源码开发时
 
 ```bash
 # 1) 软链进 profile 的 node_modules
-ln -sfn /Users/knight/deepseek-harness/技能相关/dsh-workspace-categories \
+ln -sfn /path/to/dsh-workspace-categories \
         ~/.dsh/profiles/desktop/node_modules/dsh-workspace-categories
 
 # 2) 把包名追加到 ~/.dsh/profiles/desktop/package.json 的 dsh.profile.bundles 末尾
 #    （末尾 = 优先级最高）
 ```
 
-然后**重启桌面应用**。`cordis.yml` 是生成物，不要手改。
-
-卸载：从 `dsh.profile.bundles` 去掉包名、删掉软链、重启。
+用完记得切回 npm 安装，别让软链版和 npm 版并存。
 
 ## 文件
 
