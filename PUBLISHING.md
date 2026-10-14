@@ -148,3 +148,76 @@ GitHub Actions 在打 tag 时自动 `npm publish`（`secrets.NPM_TOKEN`）。
 - [DSH Get](https://www.dshget.com/) — 网页检索目录，规范化快照公开在
   [bobby-sheng/dshget-data](https://github.com/bobby-sheng/dshget-data)
 - [dshmarket.com](https://dshmarket.com) / [awesome-dsh-plugin.com](https://awesome-dsh-plugin.com) — 同一份目录的两种呈现
+
+## 8. 踩坑：`git push` 推不上去（本机真实案例）
+
+第一次 `git push -u origin main` 会失败在**认证之前**，报：
+
+```
+error: unable to read askpass response ...
+fatal: could not read Username for 'https://gh-proxy.com': terminal prompts disabled
+```
+
+注意主机名是 **gh-proxy.com**，不是 github.com。原因：本机全局 git 配置里有一条 GitHub 加速代理重写规则
+
+```bash
+$ git config --global --get-regexp '^url\.'
+url.https://gh-proxy.com/https://github.com/.insteadof https://github.com/
+```
+
+它把**所有** `https://github.com/...` 改写成 `https://gh-proxy.com/https://github.com/...`。
+gh-proxy 是**只读下载代理**，不支持 push，所以 push 永远到不了 GitHub —— 这跟权限、token 都无关。
+
+排查命令（看 push 到底发往哪个主机）：
+
+```bash
+GIT_TERMINAL_PROMPT=0 GIT_ASKPASS=/usr/bin/false git push --dry-run origin main 2>&1 | head -3
+```
+
+### 三种修法
+
+**A. 只修当前仓库（本次采用，不动全局）** —— 给 URL 显式写 443 端口，这样它不再以
+`https://github.com/` 开头，重写规则匹配不到，又不影响任何行为：
+
+```bash
+git remote set-url origin https://github.com:443/Knight-Zjy/dsh-workspace-categories.git
+```
+
+**B. 全局删掉这条重写**（推荐，否则以后每个仓库的 push 都要再踩一次）：
+
+```bash
+git config --global --unset url.https://gh-proxy.com/https://github.com/.insteadOf
+```
+
+前提是你不再需要它加速 `git clone`。实测本机直连 GitHub 是通的（`api.github.com` → 200），
+如果 clone 变慢再加回去。
+
+**C. 改用 SSH（完全绕开 HTTPS 重写）** —— 本机 22 端口被封（banner 超时），
+但 GitHub 官方备用端口 443 是通的，remote 写：
+
+```bash
+git remote set-url origin ssh://git@ssh.github.com:443/Knight-Zjy/dsh-workspace-categories.git
+```
+
+前提是把公钥加到 GitHub 账号（见下）。
+
+### 另一个坑：SSH 报 `Permission denied (publickey)`
+
+```
+debug1: Offering public key: /Users/knight/.ssh/id_rsa RSA SHA256:hqImm+P3mXcUbWxkpG9YkvoQ8OB3Ab7QHPOal1h9+Q0
+git@ssh.github.com: Permission denied (publickey).
+```
+
+传输是通的、key 也递上去了，但 GitHub **不认这把 key** —— 需要把
+`~/.ssh/id_rsa.pub` 的内容加到 https://github.com/settings/ssh/new 。
+
+### 凭据会被 macOS 钥匙串记住
+
+本仓库已设 `git config --local credential.helper osxkeychain`，所以第一次 push 时
+输入用户名 + Personal Access Token（GitHub 早已不接受账号密码）之后就不必再输。
+
+如果报 401/403，是钥匙串里存了旧的失效凭据，先擦掉：
+
+```bash
+printf "protocol=https\nhost=github.com\n\n" | git credential-osxkeychain erase
+```
