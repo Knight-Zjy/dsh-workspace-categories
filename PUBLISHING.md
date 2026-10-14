@@ -221,3 +221,21 @@ git@ssh.github.com: Permission denied (publickey).
 ```bash
 printf "protocol=https\nhost=github.com\n\n" | git credential-osxkeychain erase
 ```
+
+### 本机最终解法（2026-10-14 实测记录）
+
+- **fine-grained token（`github_pat_...`）要两次点击才对**：新建时选好仓库还不够，必须进入
+  token 编辑页 → `Permissions` → `Repository permissions` → **`Contents` 改成 `Read and write`**
+  → **拉到页面最底部点 `Save changes`**（只改下拉框不点保存不生效）。否则 push 报
+  `remote: Permission to <owner>/<repo>.git denied to <owner>` + `HTTP 403`。
+  想确认到底缺哪项，打一个写探测：
+  ```bash
+  curl -sS -D- -o /dev/null -X POST \
+    -H "Authorization: Bearer $TOKEN" \
+    -d '{"ref":"refs/heads/__probe__","sha":"<任意commit>"}' \
+    https://api.github.com/repos/<owner>/<repo>/git/refs
+  ```
+  响应头里的 `x-accepted-github-permissions: contents=write` 就是缺的那项权限。
+  （另注：仓库为空时这个探测会返回 `409 Git Repository is empty`，那是正常的，不是权限问题。）
+- **classic token（`ghp_...`）只勾一个 `repo` 就够**，本机一次成功。省事就选它。
+- 凭据存钥匙串：`git config --local credential.helper osxkeychain`，首次 push 输一次即记住。
