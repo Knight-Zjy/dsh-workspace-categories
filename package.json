@@ -1,6 +1,6 @@
 {
   "name": "dsh-workspace-categories",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "分类树形式的工作区管理器（分类 > 工作区 > 会话），接管 DeepSeek Harness 左侧栏的工作区浏览器。",
   "type": "module",
   "main": "lib/index.js",

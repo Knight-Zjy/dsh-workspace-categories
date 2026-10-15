@@ -1,6 +1,6 @@
 {
   "meta": {
     "title": "Workspace Tree",
-    "description": "Replaces the sidebar workspace browser with a Category > Workspace > Session tree: custom categories, drag to file, remembered collapse state, one click back to the native list."
+    "description": "Category tree for the DSH sidebar workspace browser: workspaces and their sessions nest under user-made categories (collapsed state remembered), rows drag between categories, a new workspace can be created straight into one through the directory picker, categories rename and delete in place, and a footer toggle switches the panel back to the built-in list."
   }
 }
