@@ -34,6 +34,7 @@
 | 会话 | 展开工作区时默认显示 5 条，`显示更多` 每次 +10；点会话行打开该会话 |
 | 行尾数字 | 分类/工作区行尾的数量徽标用 `order`+`margin-left:auto` 顶到最右侧 |
 | 运行中标记 | 会话行右侧脉冲点 |
+| 悬浮提示 | 行内图标按钮（归档/取消归档、`+`、铅笔、`×`）复用应用自带的 `Tooltip` 原语：`side: 'bottom'`、`align: 'end'`、`delayMs: 500`，与官方 `ArchiveSessionRowButton` 同一套参数，提示文字就是按钮的 `aria-label`。`@deepseek-ai/dsh-client-ui-primitives` 是平台种子模块（前端 shell 的 `staticModules` 表里有它），所以能直接 `require`；万一将来不在种子里，`require` 抛错会被吞掉并退回原生 `title`，不会连累整棵树 |
 | 新建会话 | 工作区行的 `+`，走 `ctx.uiWorkspace.startSession(workspaceId)` |
 | **会话归档** | 会话行右侧的归档按钮：调 `ctx.get('workspaces').archiveSession(id)`；成功的会话从树上消失并在左下方弹一条「已归档「xxx」· 撤销」的提示。仍在干活的会话会被 Host 拒绝（`workspace/session-active`），此时按官方同款流程问一句「停止并归档？」，确认后带 `{ stopActivity: true }` 重试。归档行上的按钮变成「取消归档」，调 `unarchiveSession(id)` |
 | 归档筛选 | 搜索框右侧的三态下拉：`隐藏归档`（默认）/ `含归档` / `仅归档`，与官方浏览器的 `sessionVisible` 语义一致。外观是自带 caret 的斜纹小胶囊（`appearance:none` 去掉原生白底，弹出列表用 `Canvas/CanvasText` 跟随主题），选中非默认项时加粗高亮 |
@@ -112,6 +113,6 @@ ln -sfn /path/to/dsh-workspace-categories \
 - 拖拽只支持「工作区 → 分类」，不支持分类排序、不支持工作区在分类内手动排序（排序始终是置顶 + 时间倒序）。
 - 新建工作区用的是**系统目录选择器**（官方 `native` picker 同款），所以只能选已存在的目录；没有做官方 `browse` 那种应用内浏览（要浏览可以用 `uiWorkspace.listDirectory` / `createDirectory` 另做）。
 - 分类名没有长度限制，但行内会省略号截断。
-- 「停止并归档」的二次确认用的是浏览器原生 `window.confirm`（本插件不注入 UI 组件，而官方那边是一个自带的 Modal）。文案与官方一致，但样式跟随系统。
+- 「停止并归档」的二次确认用的是浏览器原生 `window.confirm`（官方那边是一个自带的 Modal）。文案与官方一致，但样式跟随系统。
 - 归档只做「归档 / 取消归档」：官方的批量归档、归档区独立分区没做；树里靠三态下拉把它们筛出来。
 - 不做跨设备同步：分类存在本机 `localStorage`，换机器/清缓存会丢。
